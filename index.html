@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Open</title>
+<style>
+  *{box-sizing:border-box}body{margin:0;height:100vh;display:flex;flex-direction:column;background:#0d1017;color:#e8ecf4;font:16px system-ui,sans-serif}
+  form{display:flex;gap:8px;padding:12px;max-width:640px;width:100%;margin:0 auto;flex-wrap:wrap}
+  body.home form{margin-top:28vh}
+  input{flex:1;min-width:0;padding:12px 14px;border-radius:12px;border:1px solid #2a3245;background:#161b26;color:inherit;font:inherit;outline:0}
+  input:focus{border-color:#7c9cff}#p{flex-basis:100%}
+  button{padding:12px 22px;border:0;border-radius:12px;background:#7c9cff;color:#0d1017;font:600 16px system-ui;cursor:pointer}
+  iframe{flex:1;border:0;background:#fff;display:none}body:not(.home) iframe{display:block}
+</style></head>
+<body class="home">
+<form id="f"><input id="p" type="password" placeholder="Password" hidden>
+<input id="u" placeholder="Search or enter a website" autofocus autocomplete="off"><button>Open</button></form>
+<iframe id="v" sandbox="allow-scripts allow-forms" title="Page"></iframe>
+<script>
+  let K=sessionStorage.getItem('k')||'';
+  fetch('/status').then(r=>r.json()).then(s=>{if(s.locked&&!K){p.hidden=false;p.focus()}});
+  addEventListener('message',e=>{if(e.data==='expired'){K='';sessionStorage.removeItem('k');p.hidden=false;document.body.classList.add('home')}});
+  f.onsubmit=async e=>{e.preventDefault();
+    if(!p.hidden){
+      const r=await fetch('/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({password:p.value})});
+      const d=await r.json();if(!r.ok){alert(d.error);return}
+      K=d.token;sessionStorage.setItem('k',K);p.hidden=true;
+    }
+    const s=u.value.trim();if(!s)return;
+    const isUrl=/^https?:\/\//i.test(s)||(!/\s/.test(s)&&s.includes('.'));
+    const t=isUrl?s:'https://html.duckduckgo.com/html/?q='+encodeURIComponent(s);
+    document.body.classList.remove('home');
+    v.src='/page?k='+encodeURIComponent(K)+'&url='+encodeURIComponent(t)};
+</script>
+</body></html>
