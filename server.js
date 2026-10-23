@@ -42,7 +42,13 @@ const fails = new Map();
 
 const app = express();
 app.set('trust proxy', 1);
-app.use(express.static('public'));
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(express.static(path.join(__dirname, "public")));
 
 app.get('/status', (_req, res) => res.json({ locked: !!PASSWORD }));
 app.post('/login', express.json({ limit: '1kb' }), (req, res) => {
