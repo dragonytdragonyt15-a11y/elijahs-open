@@ -1,0 +1,7 @@
+{
+  "name": "simple-open",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.19.2", "undici": "^6.19.5" }
+}
